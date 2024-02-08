@@ -1,34 +1,59 @@
 # Example file showing a basic pygame "game loop"
 import pygame
-from utilities import Button
+from utilities import *
 
-# pygame setup
+# Pygame setup
 pygame.init()
-screen = pygame.display.set_mode((1280, 720))
+pygame.font.init()
+screen = pygame.display.set_mode((1080, 540), pygame.RESIZABLE)
+FONT = pygame.font.Font(None, 32)
+
+# Initialize clock and running flag
 clock = pygame.time.Clock()
 running = True
-button_begin = Button([280, 50], "Let's Begin", [380, 302])
-button_begin_loop = True
 
+# Create button and input box instances
+button_begin = Button(280, 500, 200, 50, "Let's Begin", [255, 255, 255], [0, 0, 0], True)
+input_name = InputBox(100, 100, 140, 32, FONT)
 
+# Create a custom menu
+my_custom_menu = InfoBox(
+    "Title of the Menu",
+    [
+        Button(280, 500, 200, 50, "Nice", [255, 255, 255], [0, 0, 0], True)
+    ]
+)
+
+# Load and set the custom font for the InfoBox title
+info_box_title_font = pygame.font.Font("OpenSans-Bold.ttf", 24)
+set_info_box_title_font(info_box_title_font)
+
+# Main game loop
 while running:
     events = pygame.event.get()
-    for event in events:  # User did something
-        if event.type == pygame.QUIT:  # If user clicked close
-            running = False  # Flag that we are done so we exit this loop
+    for event in events:
+        if event.type == pygame.QUIT:
+            running = False
+        input_name.handle_event(event, FONT)
+    
+    # Fill the screen with white
+    screen.fill((255, 255, 255))
+    
+    # Update and draw the input box
+    input_name.update()
+    input_name.draw(screen)
 
-    # Set the screen background
-    screen.fill('white')
-
-    if button_begin_loop:
-        # Button 1 Control
-        button_begin.render(screen)
-        if button_begin.clicked(events):
-            print("Game Logic goes here")
-            button_begin_loop = False
-
+    # Render and check if the "Let's Begin" button is clicked
+    button_begin.verif_render(screen)  
+    if button_begin.clicked(events):
+        print("Game Logic goes here")
+        button_begin.actif = False
+        menu_manager.open_menu(my_custom_menu)
+    
+    # Update the display
     pygame.display.flip()
     clock.tick(60)  # Limit frame rate to 60 FPS
 
+# Quit Pygame
 pygame.quit()
 quit()
